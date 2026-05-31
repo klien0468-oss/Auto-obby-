@@ -1,0 +1,67 @@
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- 1. TẠO MENU GUI
+local ScreenGui = Instance.new("ScreenGui", PlayerGui)
+ScreenGui.Name = "BR_MODS_GUI"
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 250, 0, 150)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.Active = true
+MainFrame.Draggable = true
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "BR MODS: AUTO OBBY"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Font = Enum.Font.GothamBold
+Title.BackgroundTransparency = 1
+
+local ToggleBtn = Instance.new("TextButton", MainFrame)
+ToggleBtn.Size = UDim2.new(0.8, 0, 0.4, 0)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.4, 0)
+ToggleBtn.Text = "AUTO OBBY: OFF"
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+ToggleBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", ToggleBtn)
+
+-- 2. LOGIC AUTO OBBY (TELEPORT)
+local running = false
+
+local function autoObbyLoop()
+    while running do
+        local character = LocalPlayer.Character
+        local hrp = character and character:FindFirstChild("HumanoidRootPart")
+        
+        if hrp then
+            for _, obj in pairs(Workspace:GetDescendants()) do
+                if not running then break end
+                -- Tìm đối tượng có TouchInterest (Checkpoint)
+                if obj:IsA("BasePart") and obj:FindFirstChild("TouchInterest") then
+                    -- Teleport (Bay) đến vị trí Checkpoint
+                    hrp.CFrame = CFrame.new(obj.Position + Vector3.new(0, 2, 0))
+                    wait(0.3) -- Tốc độ nhảy checkpoint
+                end
+            end
+        end
+        wait(1)
+    end
+end
+
+-- 3. XỬ LÝ NÚT BẤM
+ToggleBtn.MouseButton1Click:Connect(function()
+    running = not running
+    if running then
+        ToggleBtn.Text = "AUTO OBBY: ON"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        autoObbyLoop()
+    else
+        ToggleBtn.Text = "AUTO OBBY: OFF"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+    end
+end)
